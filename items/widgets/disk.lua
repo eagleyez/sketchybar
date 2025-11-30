@@ -3,9 +3,9 @@ local colors = require("colors")
 local settings = require("settings")
 
 -- Update with path to stats_provider
-sbar.exec('killall stats_provider >/dev/null; /opt/homebrew/bin/stats_provider --disk usage')
+sbar.exec('killall stats_provider >/dev/null; /opt/homebrew/bin/stats_provider --disk usage --no-units')
 
--- Subscribe and use the `DISK_USAGE` var
+-- Disk Percentage
 local disk_percent = sbar.add('item', 'widgets.disk1', {
  position = "right",
   icon = {
@@ -40,8 +40,26 @@ local disk_icon = sbar.add("item", "widgets.disk2", {
   },
 })
 
+-- Subscribe and use the `DISK_USAGE` var
 disk_percent:subscribe('system_stats', function(env)
-	disk_percent:set { label = env.DISK_USAGE }
+
+    if tonumber(env.DISK_USAGE) > 80 then
+        disk_icon:set{
+            icon = {
+                color = colors.red
+            }
+        }
+    else
+        disk_icon:set{
+            icon = {
+                color = colors.white
+            }
+        }
+    end 
+  
+	disk_percent:set {      
+        label = env.DISK_USAGE .. "%"
+    }
 end)
 
 sbar.add("bracket", "widgets.disk.bracket", { 
